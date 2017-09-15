@@ -1,6 +1,7 @@
 library("rpart")
 
 runtree <- function(dataset, method) {
-  data <- read.csv("./data/`dataset`")
+  filename = paste("./data", dataset, sep="/")
+  data <- read.csv(filename)
   View(data)
 }
