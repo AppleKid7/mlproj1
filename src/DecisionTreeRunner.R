@@ -1,3 +1,3 @@
 source('dtree.R')
 
-runtree("vehicles/vehicles.csv", "class")
+runtree("vehicles/vehicles.csv")
