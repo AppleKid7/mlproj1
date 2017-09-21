@@ -8,12 +8,13 @@ class RedWineData(object):
         df = pd.read_csv('data/wine/winequality-red.csv', delimiter=';')
         df_norm = (df - df.min()) / (df.max() - df.min())
         data = df_norm.sample(frac=1).reset_index(drop=True)
-        # train_rows = math.floor(0.6* data.shape[0])                                 
-        # test_rows = data.shape[0] - train_rows
-        # trainX = data[:train_rows,0:-1]                                             
-      	# trainY = data[:train_rows,-1]                                               
-      	# testX = data[train_rows:,0:-1]                                              
-      	# testY = data[train_rows:,-1]
+        # if quality >= 0.5, this is considered good
+        # if < 0.5, it is poor 
+        def map_to_class(row):
+            return 'GOOD' if row.quality >= 0.5 else 'POOR'
+        data['CLASSES'] = data.apply (lambda row: map_to_class(row),axis=1)
+        del data['quality']
+        self.data = data
         '''
            partitioning data into training and testing set of roughly
            60/40
@@ -28,9 +29,12 @@ class RedWineData(object):
     def get_testing_data(self):
         return self.testing_data
 
+    def clean_data(self):
+        self.data.to_csv('data/wine/red_wine.csv', sep=',', encoding='utf-8')
 
 def main():
     data_getter = RedWineData()
+    data_getter.clean_data()
 
 
 if __name__ == '__main__': main()

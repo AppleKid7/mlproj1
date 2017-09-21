@@ -28,18 +28,18 @@ class VehicleSilhouteData(object):
 
         df = get_merged_csv(glob.glob(fmask), index_col=False,
                             delimiter=' ', names=column_names)
-        df.CLASSES = pd.Categorical(df.CLASSES)
-        df['CATEGORY'] = df.CLASSES.cat.codes
+        # df.CLASSES = pd.Categorical(df.CLASSES)
+        # df['CATEGORY'] = df.CLASSES.cat.codes
         '''
         0 - bus
         1 - opel
         2 - saab
         3 - van
         '''
-        del df['CLASSES']
-        # df_norm = (df.iloc[:,:-1] - df.iloc[:,:-1].min()) / (df.iloc[:,:-1].max() - df.iloc[:,:-1].min())
-        df_norm = (df - df.min())/(df.max() - df.min())
-        # df_norm = df_norm.join(df.iloc[:,-1])
+        # del df['CLASSES']
+        df_norm = (df.iloc[:,:-1] - df.iloc[:,:-1].min()) / (df.iloc[:,:-1].max() - df.iloc[:,:-1].min())
+        # df_norm = (df - df.min())/(df.max() - df.min())
+        df_norm = df_norm.join(df.iloc[:,-1])
         self.data = df_norm.sample(frac=1).reset_index(drop=True)
         '''
         partitioning data into training and testing set of roughly
