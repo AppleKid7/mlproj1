@@ -1,38 +1,64 @@
-library("rpart")
-library("rattle")
-library("rpart.plot")
-library("RColorBrewer")
-#library("caret")
+library("C50")
+library("caret")
 
-rattle()
-
-runtree <- function(dataset) {
+runtree <- function(dataset, trial=0) {
   filename = paste("./data", dataset, sep="/")
   datacsv <- read.csv(filename)
-  # View(data)
+
   dataframe  <- as.data.frame(datacsv)
-  tree = vehicletree(dataframe)
-  # plot(tree)
-  # text(tree, pretty=0)
-  ptree<- prune(tree,
-                cp= tree$cptable[which.min(tree$cptable[,"xerror"]),"CP"])
-  fancyRpartPlot(ptree, uniform=TRUE,
-                 main="Pruned Classification Tree")
-  #fancyRpartPlot(tree)
+  dataframe$X <- NULL
+  set.seed(7)
+  rows = nrow(dataframe)
+  trainrows = as.integer(rows * 0.80)
+  train_sample <- sample(1:rows, trainrows)
+  
+  train <- dataframe[train_sample, ]
+  test <- dataframe[-train_sample, ]
+  
+  target_index <- grep('CLASSES', colnames(train))
+  if(trial == 0)
+    ptree <- C5.0(x = train[, -target_index], y = train[['CLASSES']], method='class')
+  else
+    ptree <- C5.0(x = train[, -target_index], y = train[['CLASSES']], method='class',
+                  trial=trial)
+  ptree$call$x <- train[, -target_index]
+  ptree$call$y <- train[['CLASSES']]
+  plot(ptree, subtree=3)
+  test.ptree<-predict(ptree,test,type=("class"))
+  
+  table(test$CLASSES,test.ptree)
 }
 
-vehicletree <- function(dataframe) {
-  # tree <- rpart(CATEGORY ~ dataframe$COMPACTNESS + dataframe$CIRCULARITY + dataframe$DISTANCE_CIRCULARITY
-  #              + dataframe$RADIUS_RATIO + dataframe$PR.AXIS_ASPECT_RATIO + dataframe$MAX.LENGTH_ASPECT_RATIO
-  #              + dataframe$SCATTER_RATIO + dataframe$ELONGATEDNESS + dataframe$PR.AXIS_RECTANGULARITY
-  #              + dataframe$MAX.LENGTH_RECTANGULARITY + dataframe$SCALED_VARIANCE_ALONG_MAJOR_AXIS
-  #              + dataframe$SCALED_VARIANCE_ALONG_MINOR_AXIS + dataframe$SCALED_RADIUS_OF_GYRATION
-  #              + dataframe$SKEWNESS_ABOUT_MAJOR_AXIS + dataframe$SKEWNESS_ABOUT_MINOR_AXIS
-  #              + dataframe$KURTOSIS_ABOUT_MAJOR_AXIS + dataframe$HOLLOWS_RATIO,
-  #              data=dataframe,
-  #              method="class")
-  tree <- rpart(CATEGORY ~ . ,
-                data=dataframe,
-                method="class")
-  return(tree)
+savePlot <- function(myPlot, title, devoff=TRUE) {
+  filename = paste("./img", title, sep="/")
+  png(filename)
+  print(myPlot)
+  if(devoff)
+    dev.off()
+}
+
+tree_error <- function(dataset, imgname, trial=0) {
+  filename = paste("./data", dataset, sep="/")
+  datacsv <- read.csv(filename)
+  dataframe <- as.data.frame(datacsv)
+  if(trial == 0)
+    tree_data <- learing_curve_dat(dataframe, outcome = 'CLASSES',  proportion = (1:10)/10, test_prop = (1:10)/10,
+                                  method='C5.0',
+                                  metric='Accuracy',
+                                  verbose = TRUE,
+                                  trControl = trainControl(classProbs = TRUE,
+                                                           summaryFunction=defaultSummary)
+                                 )
+  else
+    tree_data <- learing_curve_dat(dataframe, outcome = 'CLASSES',  proportion = (1:10)/10, test_prop = (1:10)/10,
+                                   method='C5.0',
+                                   metric='Accuracy',
+                                   verbose = TRUE,
+                                   trControl = trainControl(classProbs = TRUE, number=trial,
+                                                            summaryFunction=defaultSummary)
+                                   )
+  myplot <- ggplot(tree_data, aes(x = Training_Size, y = Accuracy, color = Data)) + 
+    geom_smooth(method = loess, span = .8) + 
+    theme_bw()
+  savePlot(myplot, imgname)
 }
