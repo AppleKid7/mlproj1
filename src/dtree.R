@@ -1,7 +1,7 @@
 library("C50")
 library("caret")
 
-runtree <- function(dataset, trial=0) {
+runtree <- function(dataset, boosted=FALSE) {
   filename = paste("./data", dataset, sep="/")
   datacsv <- read.csv(filename)
 
@@ -16,15 +16,28 @@ runtree <- function(dataset, trial=0) {
   test <- dataframe[-train_sample, ]
   
   target_index <- grep('CLASSES', colnames(train))
-  if(trial == 0)
+  "if(trial == 0)
     ptree <- C5.0(x = train[, -target_index], y = train[['CLASSES']], method='class')
   else
     ptree <- C5.0(x = train[, -target_index], y = train[['CLASSES']], method='class',
-                  trial=trial)
+                  trial=trial)"
+  if(boosted==TRUE)
+    grid <- expand.grid(winnow = c(TRUE,FALSE), trials=c(1,5,10,15,20), model='tree')
+  else
+    grid <- expand.grid(winnow = c(TRUE,FALSE), trials=c(1), model='tree')
+  control <- trainControl(method="repeatedcv", number=10, repeats=3)
+  model <- train(x = train[, -target_index],
+                 y = train$CLASSES,
+                 data=train,
+                 tuneGrid=grid,
+                 trControl=control,
+                 method="C5.0",
+                 verbose=FALSE)
+  ptree <- model
   ptree$call$x <- train[, -target_index]
   ptree$call$y <- train[['CLASSES']]
   plot(ptree, subtree=3)
-  test.ptree<-predict(ptree,test,type=("class"))
+  test.ptree<-predict(ptree,test)
   
   table(test$CLASSES,test.ptree)
 }
