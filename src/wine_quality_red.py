@@ -32,9 +32,3 @@ class RedWineData(object):
     def clean_data(self):
         self.data.to_csv('data/wine/red_wine.csv', sep=',', encoding='utf-8')
 
-def main():
-    data_getter = RedWineData()
-    data_getter.clean_data()
-
-
-if __name__ == '__main__': main()

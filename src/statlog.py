@@ -58,9 +58,3 @@ class VehicleSilhouteData(object):
     def clean_data(self):
         self.data.to_csv('data/vehicles/vehicles.csv', sep=',', encoding='utf-8')
 
-def main():
-    data_getter = VehicleSilhouteData()
-    data_getter.clean_data()
-
-
-if __name__ == '__main__': main()

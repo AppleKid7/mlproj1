@@ -1,3 +1,4 @@
+install.packages('caret', dependencies = TRUE)
 source('dtree.R')
 
 # DECISION TREE
@@ -28,14 +29,28 @@ nn_error('wine/red_wine.csv', 'wine_nnet_error.png')
 
 # SUPPORT VECTOR MACHINE
 
-source('svm.R')
+source('svmLinear.R')
 
-runsvm('vehicles/vehicles.csv')
-svm_error('vehicles/vehicles.csv', 'vehicles_svm_error.png')
+runsvmLinear('wine/red_wine.csv')
+svm_linear_error('wine/red_wine.csv', 'wine_svm_linear_error.png')
+
+runsvmLinear('vehicles/vehicles.csv')
+svm_linear_error('vehicles/vehicles.csv', 'vehicles_svm_linear_error.png')
+
+source('svmRBF.R')
+
+runsvmRBF('wine/red_wine.csv')
+svm_rbf_error('wine/red_wine.csv', 'wine_svm_rbf_error.png')
+
+runsvmRBF('vehicles/vehicles.csv')
+svm_rbf_error('vehicles/vehicles.csv', 'vehicles_svm_rbf_error.png')
 
 # K-NEAREST NEIGHBORS
 
 source('knn.R')
+
+runknn('wine/red_wine.csv')
+knn_error('wine/red_wine.csv', 'wine_knn_error.png')
 
 runknn('vehicles/vehicles.csv')
 knn_error('vehicles/vehicles.csv', 'vehicles_knn_error.png')

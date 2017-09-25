@@ -1,7 +1,7 @@
 library("caret")
 library("gridExtra")
 
-runsvm <- function(dataset) {
+runsvmRBF <- function(dataset) {
   filename = paste("./data", dataset, sep="/")
   datacsv <- read.csv(filename)
   
@@ -27,9 +27,9 @@ runsvm <- function(dataset) {
                  method="svmRadial",
                  verbose=FALSE)
   
-  test.svm<-predict(model,test)
+  test.svmRBF<-predict(model,test)
   
-  table(test$CLASSES,test.svm)
+  table(test$CLASSES,test.svmRBF)
 }
 
 savePlot <- function(myPlot, title, devoff=TRUE) {
@@ -40,7 +40,7 @@ savePlot <- function(myPlot, title, devoff=TRUE) {
     dev.off()
 }
 
-svm_error <- function(dataset, imgname) {
+svm_rbf_error <- function(dataset, imgname) {
   filename = paste("./data", dataset, sep="/")
   datacsv <- read.csv(filename)
   dataframe <- as.data.frame(datacsv)
