@@ -1,7 +1,7 @@
 library("caret")
 library("gridExtra")
 
-mode <- function(dataset) {
+runsvmLinear <- function(dataset) {
   filename = paste("./data", dataset, sep="/")
   datacsv <- read.csv(filename)
   
