@@ -1,4 +1,3 @@
-install.packages('caret', dependencies = TRUE)
 source('dtree.R')
 
 # DECISION TREE
